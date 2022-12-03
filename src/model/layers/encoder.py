@@ -1,8 +1,7 @@
-import timm
 import torch
 import torch.nn as nn
 from src.model.layers import MLP
-from src.model.utils.utils import create_model, get_out_features
+from src.model.utils import get_out_features, create_model
 
 class Encoder(nn.Module):
     

@@ -1,61 +1,8 @@
 import timm
-import torch
 import torch.nn as nn
-from typing import Dict, Tuple
+from typing import Dict
 from src.model.vit import create_vit
-from src.model.classifier import LinearClassifier
 
-def create_linear_model(
-    backbone: str,
-    ssl_ckpt: str,
-    img_size: int,
-    num_classes: int,
-    n_last_blocks: int = 4,
-    avgpool: bool = False,
-    freeze: bool = True
-) -> Tuple[nn.Module, nn.Module]:
-    """creates ssl_backbone and clf_head for the linear evaluation
-
-    Args:
-        backbone (str): ssl backbone name
-        ssl_ckpt (str): path to checkpoint file of self-supervised model with teacher-student structure
-        img_size (int): input image size
-        num_classes (int): number of classes
-        n_last_blocks (int, optional): number of last attention blocks to consider (only for ViT). Defaults to 4.
-        avgpool (bool, optional): if avgpool attentions outputs (only for ViT). Defaults to False.
-        freeze (bool, optional): if True, the backbone weights will be frozen. Defaults to True.
-
-    Returns:
-        Tuple[nn.Module, nn.Module]: ssl_backbone, clf_head
-    """
-    
-    ssl_backbone = create_model(
-        backbone=backbone, 
-        pretrained=False, 
-        img_size=img_size
-    )
-    if ssl_ckpt is not None:
-        ssl_state_dict = torch.load(ssl_ckpt, map_location=torch.device('cpu'))["state_dict"]
-        ssl_backbone = load_state_dict_ssl(
-            model=ssl_backbone,
-            ssl_state_dict=ssl_state_dict
-        )
-    embed_dim = get_out_features(model_name=backbone)
-    if "vit" in backbone:
-        embed_dim = embed_dim * (n_last_blocks + int(avgpool))
-        
-    model = LinearClassifier(
-        backbone=ssl_backbone,
-        is_vit=True if "vit" in backbone else False,
-        in_feat=embed_dim,
-        num_classes=num_classes,
-        n_last_blocks=n_last_blocks,
-        avgpool=avgpool,
-        freeze=freeze
-    )
-    
-    return model
-    
 def create_model(
     backbone: str, 
     pretrained: bool = True,
@@ -95,7 +42,7 @@ def create_model(
 def get_out_features(
     model_name: str
 ) -> int:
-    """returns the out features dim of a
+    """returns the out features dim of a model
 
     Args:
         model_name (str): model name for timm

@@ -23,7 +23,6 @@ class TeacherStudentSSLModule(pl.LightningModule):
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
         self.last_layer_frozen = last_layer_frozen
-        #self.evaluator = KNNEvaluator()
         
     def forward(self, views):
         return self.model(views)
@@ -44,12 +43,7 @@ class TeacherStudentSSLModule(pl.LightningModule):
         
         self.log("loss/train", loss, sync_dist=True, prog_bar=True)
         self.log("lr", self.lr_scheduler.get_last_lr()[0], prog_bar=True)
-        
-        # self.evaluator.update(
-        #     split="train",
-        #     embeds=self.model.embeds(x),
-        # )
-        
+                
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -58,22 +52,12 @@ class TeacherStudentSSLModule(pl.LightningModule):
         outputs = self(views)
         loss = self.criterion(outputs)
         
-        # self.evaluator.update(
-        #     split="val",
-        #     embeds=self.model.embeds(x),
-        #     targets=targets
-        # )
-        
         return {'val_loss': loss}
 
     def validation_epoch_end(self, outputs):
-        # acc = self.evaluator.compute()
-        # just for lightning compatibility
-        # acc = torch.Tensor([acc])
-        # self.evaluator.reset()
+        
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
         self.log("loss/val", avg_loss, sync_dist=True, prog_bar=True)
-        # self.log("acc/val", acc, sync_dist=True, prog_bar=True)
         
     def training_epoch_end(self, outputs):
         pass
