@@ -50,7 +50,6 @@ Here some examples of attentions maps of ViT-tiny/16 (img size 96) trained with 
   </tr>
 </table>
 
-
 ## **Train Self-Supervised Backbone**
 The repository supports [timm](https://github.com/rwightman/pytorch-image-models) models as backbones for both BYOL and DINO. 
 
@@ -69,13 +68,6 @@ Custom implementation of ViT is provided to be flexible on the image size. These
 * custom_vit_base_patch16
 
 Image size will always be the one specified in the configuration file under the *transform* section. For all the other timm's models, please refer to its documentation to set the proper image input size.
-
-## **Linear Evaluation**
-Train a linear classifier on top of frozen features from self-sup backbone with *linear_eval.py* script.
-
-```
-python linear_eval.py --ssl-config PATH/TO/SSL/BACKBONE/CONFIG.yml --linear-config config/linear/config.yml --ssl-ckpt  PATH/TO/CKPT/SSL/BACKBONE --data-dir PATH/TO/STL10 --checkpoints-dir PATH/TO/DIR/TO/SAVE/PTH
-```
 
 ## **Notebooks**
 The folder *notebooks* contains the following notebooks:
