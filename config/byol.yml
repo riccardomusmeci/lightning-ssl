@@ -5,7 +5,7 @@ framework: byol
 trainer:
   accelerator: gpu
   devices: 1
-  max_epochs: 300
+  max_epochs: 5
   precision: 16
   check_val_every_n_epoch: 1
   gradient_clip_val: 3
@@ -13,11 +13,11 @@ trainer:
 ##### Data Module ######
 datamodule:
   with_folders: true
-  max_samples: 1000
+  max_samples: 500
   random_samples: true
   batch_size: 128
   shuffle: true
-  num_workers: 10
+  num_workers: 5
   pin_memory: true
   drop_last: false
   persistent_workers: true
@@ -28,14 +28,12 @@ model:
   pretrained: true                            # load pretrained weights for backbone
   hidden_dim: 4096                            # MLP predictor hidden units
   proj_dim: 256                               # MLP output size
+  num_layers: 2                               # MLP layers
+  use_bn: true                                # use BatchNorm in MLP layer
+  use_gelu: false                             # use GELU and not ReLU in MLP layer
+  drop_p: 0                                   # final dropout prob
+  init_weights: true                          # init weights for the MLP
   beta: 0.996                                 # EMA param to update target weights
-  out_dim: 65568                              # [DINO] feature out dim
-  num_layers: 3                               # [DINO] MLP layers
-  use_bn: false                               # [DINO] use BatchNorm in MLP layer
-  use_gelu: true                              # [DINO] use GELU and not ReLU in MLP layer
-  drop_p: 0                                   # [DINO] final dropout prob
-  init_weights: false                         # [DINO] init weights for the MLP
-  norm_last_layer: true                       # [DINO] normalize last layer DINO output. Default is true.
 
 ###### Loss Criterion ######
 loss:
@@ -57,11 +55,6 @@ lr_scheduler:
 ###### Augmentations ######
 transform: 
   img_size: 224                               # input image size
-  local_crop_size: 32                         # [DINO] crop size 
-  crop_resize_p: 1                            # [DINO] crop resize probability
-  global_crops_scale: [0.4, 1]                # [DINO] crop resize scale for gloabl crop
-  local_crops_scale: [0.05, .4]               # [DINO] crop resize scale for local crop
-  n_local_crops: 4                            # [DINO] number of local crops
   mean: [0.485, 0.456, 0.406]                 # ImageNet mean normalization ([0.485, 0.456, 0.406])
   std: [0.229, 0.224, 0.225]                  # ImageNet std normalization ([0.229, 0.224, 0.225])
   brightness: 0.4                             # color jitter brightness
@@ -74,8 +67,6 @@ transform:
   kernel: [3, 3]                              # gaussian blur kernel size
   sigma: [.1, 2]                              # gaussian blur params
   gaussian_blur_p: 0.1                        # gaussian blur transformation probability
-  solarization_p: 0.2
-  solarize_t: 170
   
 ##### Callbacks #####
 callbacks:

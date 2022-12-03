@@ -58,12 +58,7 @@ lr_scheduler:
   warmup_start_lr: 0.0                        # initial lr at the linear warmup period (lr will reach optim lr in the linear stage either increasing or decreasing)
   eta_min: 0.000001                           # minimum lr in the scheduler
   last_epoch: -1
-  # name: cosine
-  # params:
-  #   T_0: 10                                   # number of epochs to reduce the lr
-  #   T_mult: 2                                 # lr reducing factor (e.g. 2 means lr/2 at each epoch)
-  #   eta_min: 0                                # min lr
-    
+  
 ###### Augmentations ######
 transform: 
   img_size: 96                                # input image size
@@ -71,7 +66,7 @@ transform:
   crop_resize_p: 1                            
   global_crops_scale: [0.4, 1]
   local_crops_scale: [0.05, .4]
-  n_local_crops: 4
+  n_local_crops: 1
   mean: [0.485, 0.456, 0.406]                 # ImageNet mean normalization ([0.485, 0.456, 0.406])
   std: [0.229, 0.224, 0.225]                  # ImageNet std normalization ([0.229, 0.224, 0.225])
   brightness: 0.4                             # color jitter brightness
@@ -83,7 +78,6 @@ transform:
   h_flip_p: 0.5                               # horizontal flip transformation probabilty
   kernel: [5, 5]                              # gaussian blur kernel size
   sigma: [.1, 2]                              # gaussian blur params
-  # gaussian_blur_p: 0.1                        # gaussian blur transformation probability
   solarization_p: 0.2
   solarize_t: 170
 
