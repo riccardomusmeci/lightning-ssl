@@ -1,3 +1,6 @@
+##### Framework #####
+framework: dino
+
 ##### Trainer #####
 trainer:
   accelerator: gpu                                         
@@ -9,6 +12,9 @@ trainer:
 
 ##### Data Module ######
 datamodule:
+  with_folders: true
+  max_samples: 1000
+  random_samples: true
   batch_size: 64
   shuffle: true
   num_workers: 10
@@ -22,6 +28,7 @@ model:
   pretrained: false                           # load pretrained weights for backbone
   hidden_dim: 4096                            # MLP predictor hidden units
   proj_dim: 256                               # MLP output size
+  beta: 0.996                                 # EMA param to update target weights
   out_dim: 65568                              # DINO feature out dim
   num_layers: 3                               # MLP layers
   use_bn: false                               # use BatchNorm in MLP layer
@@ -29,8 +36,7 @@ model:
   drop_p: 0                                   # final dropout prob
   init_weights: false                         # init weights for the MLP
   norm_last_layer: true                       # normalize last layer DINO output. Default is true.
-  beta: 0.996                                 # EMA param to update target weights
-
+  
 ###### Loss ######
 loss:
   out_dim : 65568                             # DINO feature out dim
@@ -52,12 +58,7 @@ lr_scheduler:
   warmup_start_lr: 0.0                        # initial lr at the linear warmup period (lr will reach optim lr in the linear stage either increasing or decreasing)
   eta_min: 0.000001                           # minimum lr in the scheduler
   last_epoch: -1
-  # name: cosine
-  # params:
-  #   T_0: 10                                   # number of epochs to reduce the lr
-  #   T_mult: 2                                 # lr reducing factor (e.g. 2 means lr/2 at each epoch)
-  #   eta_min: 0                                # min lr
-    
+  
 ###### Augmentations ######
 transform: 
   img_size: 96                                # input image size
@@ -65,7 +66,7 @@ transform:
   crop_resize_p: 1                            
   global_crops_scale: [0.4, 1]
   local_crops_scale: [0.05, .4]
-  n_local_crops: 4
+  n_local_crops: 1
   mean: [0.485, 0.456, 0.406]                 # ImageNet mean normalization ([0.485, 0.456, 0.406])
   std: [0.229, 0.224, 0.225]                  # ImageNet std normalization ([0.229, 0.224, 0.225])
   brightness: 0.4                             # color jitter brightness

@@ -1,46 +1,44 @@
 from src.loss import SSLLOSS
 import pytorch_lightning as pl
 from src.io.io import load_config
+from src.transform import Transform
 from src.optimizer import Optimizer
 from src.scheduler import LRScheduler
+from src.utils import Callbacks, Logger
 from src.datamodule import SSLDataModule
-from src.transform import TrainTransform, ValTransform
-from src.utils.trainer import get_callbacks, get_logger
 from src.model import SSLModel, TeacherStudentSSLModule
 
-def train_ssl(args):
+def train(args):
     
     pl.seed_everything(args.seed)
     
     config = load_config(args.config)
     
-    # Train + Validation transform
-    train_transform = TrainTransform(
-        model=args.model,
-        **config["transform"]
-    ) 
-    val_transform = ValTransform(
-        model=args.model,
-        **config["transform"]
-    )
-    
     # Data Module
     datamodule = SSLDataModule(
         data_dir=args.data_dir,
-        train_transform=train_transform,
-        val_transform=val_transform,
+        train_transform=Transform(
+            framework=config["framework"],
+            train=True,
+            **config["transform"]
+        ),
+        val_transform=Transform(
+            framework=config["framework"],
+            train=False,
+            **config["transform"]
+        ),
         **config["datamodule"]
     )
     
     # setting up model, loss, optimizer, lr_scheduler
     model = SSLModel(
-        model=args.model,
+        framework=config["framework"],
         img_size=config["transform"]["img_size"],
         **config["model"]
     )
     
     criterion = SSLLOSS(
-        model=args.model,
+        framework=config["framework"],
         **config["loss"]
     )
     
@@ -55,15 +53,15 @@ def train_ssl(args):
         **config["lr_scheduler"]
     )
     
-    ssl_model = TeacherStudentSSLModule(
+    ssl_module = TeacherStudentSSLModule(
         model=model,
         criterion=criterion,
         optimizer=optimizer,
         lr_scheduler=lr_scheduler
     )
     
-    logger = get_logger(output_dir=args.checkpoint_dir)
-    callbacks = get_callbacks(
+    logger = Logger(output_dir=args.checkpoint_dir)
+    callbacks = Callbacks(
         output_dir=args.checkpoint_dir,
         **config["callbacks"]
     )
@@ -79,6 +77,6 @@ def train_ssl(args):
         **config["trainer"]
     )
     
-    trainer.fit(model=ssl_model, datamodule=datamodule)
+    trainer.fit(model=ssl_module, datamodule=datamodule)
     
     

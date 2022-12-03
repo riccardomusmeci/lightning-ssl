@@ -1,5 +1,5 @@
 import pytorch_lightning as pl
-from src.dataset import SSLSTL10
+from src.dataset import SSLDataset
 from torch.utils.data import DataLoader
 from src.dataset.utils import collate_fn
 from typing import List, Dict, Union, Callable, Optional
@@ -9,7 +9,10 @@ class SSLDataModule(pl.LightningDataModule):
     def __init__(
         self, 
         data_dir: str,
-        batch_size: int,
+        with_folders: bool = True,
+        max_samples: int = None,
+        random_samples: bool = False,
+        batch_size: int = 32,
         train_transform: Callable = None, 
         val_transform: Callable = None, 
         shuffle: bool = True,
@@ -18,8 +21,12 @@ class SSLDataModule(pl.LightningDataModule):
         drop_last: bool = False,
         persistent_workers: bool = True
     ):
+        
         super().__init__()
         self.data_dir = data_dir
+        self.with_folders = with_folders
+        self.max_samples = max_samples
+        self.random_samples = random_samples
         self.batch_size = batch_size
         self.train_transform = train_transform
         self.val_transform = val_transform
@@ -35,24 +42,32 @@ class SSLDataModule(pl.LightningDataModule):
     def setup(self, stage: Optional[str] = None) -> None:
         
         if stage == "fit" or stage is None:
-            
-            self.train_dataset = SSLSTL10(
-                root=self.data_dir,
-                train=True,
+            self.train_dataset = SSLDataset(
+                root_dir=self.data_dir,
+                split="train",
+                with_folders=self.with_folders,
+                max_samples=self.max_samples,
+                random_samples=self.random_samples,
                 transform=self.train_transform
             )
             
-            self.val_dataset = SSLSTL10(
-                root=self.data_dir,
-                train=False,
-                transform=self.val_transform
+            self.val_dataset = SSLDataset(
+                root_dir=self.data_dir,
+                split="val",
+                with_folders=self.with_folders,
+                max_samples=self.max_samples,
+                random_samples=self.random_samples,
+                transform=self.train_transform
             )
-        
+            
         if stage == "test" or stage is None:
-            self.test_dataset = SSLSTL10(
-                root=self.data_dir,
-                train=False,
-                transform=self.val_transform
+            self.test_dataset = SSLDataset(
+                root_dir=self.data_dir,
+                split="val",
+                with_folders=self.with_folders,
+                max_samples=self.max_samples,
+                random_samples=self.random_samples,
+                transform=self.train_transform
             )
             
     def train_dataloader(self) -> Union[DataLoader, List[DataLoader], Dict[str, DataLoader]]:

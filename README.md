@@ -4,12 +4,12 @@ Pytorch-Lightning implementation of two of the most important self-supervised le
 
 * **BYOL** ([`arXiv`](https://arxiv.org/pdf/2006.07733.pdf), [`repository`](https://github.com/deepmind/deepmind-research/tree/master/byol))
 <p align="center">
-    <img width="70%" src=".static/byol_diagram.png" alt>
+    <img width="70%" src="static/byol_diagram.png" alt>
 </p>
 
 * **DINO** ([`arXiv`](https://arxiv.org/pdf/2104.14294.pdf), [`repository`](https://github.com/facebookresearch/dino))
 <p align="center">
-    <img width="70%%" src=".static/dino.gif" alt>
+    <img width="70%%" src="static/dino.gif" alt>
 </p>
 
 ## **Dataset**
@@ -21,13 +21,13 @@ Train and test images must be divided into folders, every one representing a cla
 Here some examples of attentions maps of ViT-tiny/16 (img size 96) trained with DINO for 300 epochs on STL10.
 
 <p align="center">
-    <img width="70%%" src=".static/airplane.png" alt>
+    <img width="70%%" src="static/airplane.png" alt>
 </p>
 <p align="center">
-    <img width="70%%" src=".static/cat.png" alt>
+    <img width="70%%" src="static/cat.png" alt>
 </p>
 <p align="center">
-    <img width="70%%" src=".static/truck.png" alt>
+    <img width="70%%" src="static/truck.png" alt
 </p>
 
 <table>
@@ -50,7 +50,6 @@ Here some examples of attentions maps of ViT-tiny/16 (img size 96) trained with 
   </tr>
 </table>
 
-
 ## **Train Self-Supervised Backbone**
 The repository supports [timm](https://github.com/rwightman/pytorch-image-models) models as backbones for both BYOL and DINO. 
 
@@ -58,7 +57,7 @@ Both BYOL and DINO come with a YAML configuration file in *config/* folder. Play
 
 To train the model with DINO, please run:
 ```
-python train_ssl.py --config config/ssl/dino.yml --model dino --data-dir PATH/TO/STL10 --checkpoints-dir PATH/TO/DIR/TO/SAVE/PTH
+python train.py --config config/dino.yml --data-dir PATH/TO/STL10 --checkpoints-dir PATH/TO/DIR/TO/SAVE/PTH
 ```
 
 
@@ -69,13 +68,6 @@ Custom implementation of ViT is provided to be flexible on the image size. These
 * custom_vit_base_patch16
 
 Image size will always be the one specified in the configuration file under the *transform* section. For all the other timm's models, please refer to its documentation to set the proper image input size.
-
-## **Linear Evaluation**
-Train a linear classifier on top of frozen features from self-sup backbone with *linear_eval.py* script.
-
-```
-python linear_eval.py --ssl-config PATH/TO/SSL/BACKBONE/CONFIG.yml --linear-config config/linear/config.yml --ssl-ckpt  PATH/TO/CKPT/SSL/BACKBONE --data-dir PATH/TO/STL10 --checkpoints-dir PATH/TO/DIR/TO/SAVE/PTH
-```
 
 ## **Notebooks**
 The folder *notebooks* contains the following notebooks:

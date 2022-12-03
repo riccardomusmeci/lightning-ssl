@@ -1,14 +1,20 @@
+##### Framework #####
+framework: byol                        
+
 ##### Trainer #####
 trainer:
   accelerator: gpu
-  devices: [0] 
-  max_epochs: 300
+  devices: 1
+  max_epochs: 5
   precision: 16
   check_val_every_n_epoch: 1
   gradient_clip_val: 3
 
 ##### Data Module ######
 datamodule:
+  with_folders: true
+  max_samples: 500
+  random_samples: true
   batch_size: 128
   shuffle: true
   num_workers: 5
@@ -19,20 +25,25 @@ datamodule:
 ###### BYOL ######
 model:
   backbone: resnet18                          # model to use as feature extractor (supported: resnet18, resnet50, effdetb0)
-  pretrained: false                           # load pretrained weights for backbone
+  pretrained: true                            # load pretrained weights for backbone
   hidden_dim: 4096                            # MLP predictor hidden units
   proj_dim: 256                               # MLP output size
+  num_layers: 2                               # MLP layers
+  use_bn: true                                # use BatchNorm in MLP layer
+  use_gelu: false                             # use GELU and not ReLU in MLP layer
+  drop_p: 0                                   # final dropout prob
+  init_weights: true                          # init weights for the MLP
   beta: 0.996                                 # EMA param to update target weights
+
+###### Loss Criterion ######
+loss:
+  base: norm_mse                              # loss fn
 
 ###### Optimizer ######  
 optimizer:
   algo: sgd                                   # optimization algorithm
   lr: 0.0005                                  # learning rate will be adapted to the rule (lr * batch_size / 256.)
   weight_decay: 1.5e-6                        # weight decay                     
-
-###### Loss Criterion ######
-loss:
-  base: norm_mse                              # loss fn
 
 ###### LR Scheduler ######
 lr_scheduler:
@@ -56,7 +67,7 @@ transform:
   kernel: [3, 3]                              # gaussian blur kernel size
   sigma: [.1, 2]                              # gaussian blur params
   gaussian_blur_p: 0.1                        # gaussian blur transformation probability
-
+  
 ##### Callbacks #####
 callbacks:
   filename: epoch={epoch}-step={step}-val_loss={loss/val:.3f}

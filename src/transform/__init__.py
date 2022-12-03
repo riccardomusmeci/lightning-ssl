@@ -1,3 +1,3 @@
-from .transform import train_transform as TrainTransform
-from .transform import val_transform as ValTransform
-from .base import ClassifierTransform
+from .dino import DINOTransform
+from .base import SSLTransform
+from .transform import transform as Transform

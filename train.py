@@ -1,32 +1,25 @@
 import argparse
-from src.core.train_ssl import train_ssl
+from src.core import train
 
 def parse_args() -> argparse.Namespace:
     
     parser = argparse.ArgumentParser()
     
     parser.add_argument(
-        "--model",
-        choices=["dino", "byol"],
-        default="dino",
-        help="model name (dino/byol).",
-    )
-    
-    parser.add_argument(
         "--config",
-        default="config/ssl/dino.yml",
+        default="config/dino.yml",
         help="path to YAML configuration file.",
     )
     
     parser.add_argument(
         "--data-dir",
-        default="/Users/riccardomusmeci/Developer/data/stl10",
+        required=True,
         help="dataset path"
     )
     
     parser.add_argument(
         "--checkpoint-dir",
-        default="/Users/riccardomusmeci/Developer/experiments/lightning-ssl",
+        required=True,
         help="where to save checkpoints during training"
     )
     
@@ -46,4 +39,4 @@ def parse_args() -> argparse.Namespace:
 if __name__ == "__main__":
     
     args = parse_args()
-    train_ssl(args)    
+    train(args)    

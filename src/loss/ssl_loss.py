@@ -3,23 +3,23 @@ from src.loss.byol import BYOLLoss
 from src.loss.dino import DINOLoss
 
 def ssl_loss(
-    model: str,
+    framework: str,
     **kwargs
 ) -> Union[DINOLoss, BYOLLoss]:
     """returns self supervised loss
 
     Args:
-        model (str): model name
+        framework (str): framework name
 
     Returns:
         Union[DINOLoss, BYOLLoss]: self supervised loss
     """
     
-    if model == "byol":
+    if framework == "byol":
         return BYOLLoss(**kwargs)
 
-    if model == "dino":
+    if framework == "dino":
         return DINOLoss(**kwargs)
 
-    print(f"{model} not supported.")
+    print(f"{framework} not supported.")
     quit()
