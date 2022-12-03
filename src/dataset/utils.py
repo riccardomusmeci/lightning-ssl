@@ -8,6 +8,6 @@ def collate_fn(batch):
         for i, view in enumerate(x[1]):
             views[i].append(torch.tensor(view))
     views = [torch.stack(view) for view in views]
-    labels = torch.stack([torch.tensor(x[2]) for x in batch], dim=0)
+    #labels = torch.stack([torch.tensor(x[2]) for x in batch], dim=0)
     
-    return imgs, views, labels
+    return imgs, views
