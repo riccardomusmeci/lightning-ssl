@@ -1,0 +1,86 @@
+##### Framework #####
+framework: byol                        
+
+##### Trainer #####
+trainer:
+  accelerator: gpu
+  devices: 1
+  max_epochs: 300
+  precision: 16
+  check_val_every_n_epoch: 1
+  gradient_clip_val: 3
+
+##### Data Module ######
+datamodule:
+  with_folders: true
+  max_samples: 1000
+  random_samples: true
+  batch_size: 128
+  shuffle: true
+  num_workers: 10
+  pin_memory: true
+  drop_last: false
+  persistent_workers: true
+
+###### BYOL ######
+model:
+  backbone: resnet18                          # model to use as feature extractor (supported: resnet18, resnet50, effdetb0)
+  pretrained: true                            # load pretrained weights for backbone
+  hidden_dim: 4096                            # MLP predictor hidden units
+  proj_dim: 256                               # MLP output size
+  beta: 0.996                                 # EMA param to update target weights
+  out_dim: 65568                              # [DINO] feature out dim
+  num_layers: 3                               # [DINO] MLP layers
+  use_bn: false                               # [DINO] use BatchNorm in MLP layer
+  use_gelu: true                              # [DINO] use GELU and not ReLU in MLP layer
+  drop_p: 0                                   # [DINO] final dropout prob
+  init_weights: false                         # [DINO] init weights for the MLP
+  norm_last_layer: true                       # [DINO] normalize last layer DINO output. Default is true.
+
+###### Loss Criterion ######
+loss:
+  base: norm_mse                              # loss fn
+
+###### Optimizer ######  
+optimizer:
+  algo: sgd                                   # optimization algorithm
+  lr: 0.0005                                  # learning rate will be adapted to the rule (lr * batch_size / 256.)
+  weight_decay: 1.5e-6                        # weight decay                     
+
+###### LR Scheduler ######
+lr_scheduler:
+  name: cosine                                # lr_scheduler name
+  T_0: 10                                     # number of epochs to reduce the lr
+  T_mult: 2                                   # lr reducing factor (e.g. 2 means lr/2 at each epoch)
+  eta_min: 0                                  # min lrdecreasing)
+    
+###### Augmentations ######
+transform: 
+  img_size: 224                               # input image size
+  local_crop_size: 32                         # [DINO] crop size 
+  crop_resize_p: 1                            # [DINO] crop resize probability
+  global_crops_scale: [0.4, 1]                # [DINO] crop resize scale for gloabl crop
+  local_crops_scale: [0.05, .4]               # [DINO] crop resize scale for local crop
+  n_local_crops: 4                            # [DINO] number of local crops
+  mean: [0.485, 0.456, 0.406]                 # ImageNet mean normalization ([0.485, 0.456, 0.406])
+  std: [0.229, 0.224, 0.225]                  # ImageNet std normalization ([0.229, 0.224, 0.225])
+  brightness: 0.4                             # color jitter brightness
+  contrast: 0.4                               # color jitter contrast
+  saturation: 0.2                             # color jitter saturation
+  hue: 0.1                                    # color jitter hue            
+  color_jitter_p: 0.5                         # color jitter transformation probability
+  grayscale_p: 0.2                            # grayscale transformation probabilty
+  h_flip_p: 0.5                               # horizontal flip transformation probabilty
+  kernel: [3, 3]                              # gaussian blur kernel size
+  sigma: [.1, 2]                              # gaussian blur params
+  gaussian_blur_p: 0.1                        # gaussian blur transformation probability
+  solarization_p: 0.2
+  solarize_t: 170
+  
+##### Callbacks #####
+callbacks:
+  filename: epoch={epoch}-step={step}-val_loss={loss/val:.3f}
+  monitor: loss/val
+  mode: min
+  save_top_k: 20
+  patience: 20
