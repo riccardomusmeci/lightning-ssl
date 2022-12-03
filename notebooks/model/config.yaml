@@ -1,0 +1,81 @@
+##### Trainer #####
+trainer:
+  accelerator: gpu                                         
+  devices: 1                                              
+  max_epochs: 300
+  precision: 16
+  check_val_every_n_epoch: 1
+  gradient_clip_val: 3
+
+##### Data Module ######
+datamodule:
+  batch_size: 16
+  shuffle: true
+  num_workers: 10
+  pin_memory: true
+  drop_last: true
+  persistent_workers: true
+
+###### DINO ######
+model:
+  backbone: custom_vit_tiny_patch16           # model backbone
+  pretrained: true                            # load pretrained weights for backbone
+  hidden_dim: 4096                            # MLP predictor hidden units
+  proj_dim: 256                               # MLP output size
+  out_dim: 65568                              # DINO feature out dim
+  num_layers: 3                               # MLP layers
+  use_bn: false                               # use BatchNorm in MLP layer
+  use_gelu: true                              # use GELU and not ReLU in MLP layer
+  drop_p: 0                                   # final dropout prob
+  init_weights: false                         # init weights for the MLP
+  norm_last_layer: true                       # normalize last layer DINO output. Default is true.
+  beta: 0.996                                 # EMA param to update target weights
+
+###### Loss ######
+loss:
+  out_dim : 65568                             # DINO feature out dim
+  teacher_temp: 0.04                          # teacher temperature
+  student_temp: 0.1                           # student temperature
+  center_momentum: 0.9                        # center momentum for EMA
+
+###### Optimizer ######  
+optimizer:
+  algo: adamw                                 # optimization algorithm
+  lr: 0.005                                   # learning rate will be adapted to the rule (lr * batch_size / 256.)
+  weight_decay: 1.5e-6                        # weight decay                     
+
+###### LR Scheduler ######
+lr_scheduler:
+  name: linear_cosine                         # lr_scheduler name
+  warmup_epochs: 10                           # linear warmup number of epochs
+  max_epochs: 20                              # cosine annealing number of epochs after linear warmup
+  warmup_start_lr: 0.0                        # initial lr at the linear warmup period (lr will reach optim lr in the linear stage either increasing or decreasing)
+  eta_min: 0.000001                           # minimum lr in the scheduler
+  last_epoch: -1
+  # name: cosine
+  # params:
+  #   T_0: 10                                   # number of epochs to reduce the lr
+  #   T_mult: 2                                 # lr reducing factor (e.g. 2 means lr/2 at each epoch)
+  #   eta_min: 0                                # min lr
+    
+###### Augmentations ######
+transform: 
+  img_size: 96                               # input image size
+  local_crop_size: 32                         # crop size 
+  crop_resize_p: 1                            
+  global_crops_scale: [0.4, 1]
+  local_crops_scale: [0.05, .4]
+  n_local_crops: 8
+  mean: [0.485, 0.456, 0.406]                 # ImageNet mean normalization ([0.485, 0.456, 0.406])
+  std: [0.229, 0.224, 0.225]                  # ImageNet std normalization ([0.229, 0.224, 0.225])
+  brightness: 0.4                             # color jitter brightness
+  contrast: 0.4                               # color jitter contrast
+  saturation: 0.2                             # color jitter saturation
+  hue: 0.1                                    # color jitter hue            
+  color_jitter_p: 0.5                         # color jitter transformation probability
+  grayscale_p: 0.2                            # grayscale transformation probabilty
+  h_flip_p: 0.5                               # horizontal flip transformation probabilty
+  kernel: [5, 5]                              # gaussian blur kernel size
+  sigma: [.1, 2]                              # gaussian blur params
+  solarization_p: 0.2
+  solarize_t: 170
