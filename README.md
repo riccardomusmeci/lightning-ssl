@@ -58,7 +58,7 @@ Both BYOL and DINO come with a YAML configuration file in *config/* folder. Play
 
 To train the model with DINO, please run:
 ```
-python train_ssl.py --config config/ssl/dino.yml --model dino --data-dir PATH/TO/STL10 --checkpoints-dir PATH/TO/DIR/TO/SAVE/PTH
+python train.py --config config/dino.yml --data-dir PATH/TO/STL10 --checkpoints-dir PATH/TO/DIR/TO/SAVE/PTH
 ```
 
 
