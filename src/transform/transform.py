@@ -40,6 +40,7 @@ def transform(
             local_crop_size=local_crop_size,
             global_crops_scale=global_crops_scale,
             local_crops_scale=local_crops_scale,
+            n_local_crops=n_local_crops,
             mean=mean,
             std=std,
             crop_resize_p=crop_resize_p,

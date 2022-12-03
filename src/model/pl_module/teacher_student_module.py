@@ -16,6 +16,15 @@ class TeacherStudentSSLModule(pl.LightningModule):
         lr_scheduler: _LRScheduler = None,
         last_layer_frozen: int = 2,
     ) -> None:
+        """Teacher-Student Self-Supervised PL Module
+
+        Args:
+            model (nn.Module): self-supervised framework
+            criterion (nn.Module): loss criterion
+            optimizer (Optimizer): optimizer
+            lr_scheduler (_LRScheduler, optional): learning rate scheduler. Defaults to None.
+            last_layer_frozen (int, optional): if last layer is to freeze. Defaults to 2.
+        """
         
         super().__init__()        
         self.model = model
@@ -29,7 +38,7 @@ class TeacherStudentSSLModule(pl.LightningModule):
         
     def training_step(self, batch, batch_idx):
         
-        x, views, _ = batch
+        x, views = batch
         outputs = self(views)
         loss = self.criterion(outputs)
         
@@ -48,7 +57,7 @@ class TeacherStudentSSLModule(pl.LightningModule):
     
     def validation_step(self, batch, batch_idx):
         
-        x, views, targets = batch
+        x, views = batch
         outputs = self(views)
         loss = self.criterion(outputs)
         

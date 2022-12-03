@@ -81,7 +81,10 @@ class SSLTransform:
                 A.Normalize(mean=mean, std=std),
             ])
             
-    def __call__(self, img: Union[np.array, PIL.Image.Image]) -> Tuple[np.array, np.array, np.array]:
+    def __call__(
+        self, 
+        img: Union[np.array, PIL.Image.Image]
+    ) -> Tuple[np.array, np.array, np.array]:
         """Apply augmentations
 
         Args:

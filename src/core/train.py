@@ -29,8 +29,7 @@ def train(args):
         ),
         **config["datamodule"]
     )
-    datamodule.setup()
-    quit()
+    
     # setting up model, loss, optimizer, lr_scheduler
     model = SSLModel(
         framework=config["framework"],
