@@ -1,2 +1,1 @@
-from .ssl import SSLDataModule
-from .classifier import ClassifierDataModule
+from .base import SSLDataModule
